@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Matematika O’yini</title>
+<style>
+:root{
+  --bg1:#eef2ff;--bg2:#fdf2f8;--card:#ffffff;--text:#1e1b4b;--muted:#6b7280;
+  --accent:#6366f1;--accent2:#8b5cf6;--ok:#16a34a;--bad:#dc2626;--field:#f5f6ff;--line:#e0e3f5;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg1:#0f1020;--bg2:#1b1030;--card:#1a1b30;--text:#eef0ff;--muted:#9aa0c3;--field:#242645;--line:#33365e;}}
+:root[data-theme="dark"]{--bg1:#0f1020;--bg2:#1b1030;--card:#1a1b30;--text:#eef0ff;--muted:#9aa0c3;--field:#242645;--line:#33365e;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));background-color:var(--bg1)}
+.card{width:100%;max-width:440px;background:var(--card);border-radius:24px;padding:26px 22px;
+  box-shadow:0 20px 50px rgba(99,102,241,.18);border:1px solid var(--line)}
+h1{margin:0 0 4px;font-size:26px;text-align:center}
+.sub{text-align:center;color:var(--muted);margin:0 0 20px;font-size:14px}
+.hidden{display:none!important}
+input{width:100%;font-size:18px;padding:14px 16px;border-radius:14px;border:2px solid var(--line);
+  background:var(--field);color:var(--text);outline:none;margin-bottom:12px;font-family:inherit}
+input:focus{border-color:var(--accent)}
+button{font-family:inherit;font-size:17px;font-weight:600;border:0;border-radius:14px;padding:14px 18px;
+  cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));width:100%;transition:transform .1s}
+button:active{transform:scale(.97)}
+button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-size:14px;padding:8px 12px;width:auto}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tabs button{background:var(--field);color:var(--muted);box-shadow:none}
+.tabs button.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.msg{min-height:22px;text-align:center;font-size:15px;margin:8px 0;font-weight:600}
+.msg.bad{color:var(--bad)}.msg.ok{color:var(--ok)}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px}
+.user{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stats{display:flex;gap:10px;margin-bottom:14px}
+.stat{flex:1;background:var(--field);border-radius:16px;padding:10px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat b{font-size:24px}
+.bar{height:12px;border-radius:99px;background:var(--field);overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--ok),#f59e0b,var(--bad));
+  background-size:300% 100%;transition:width 1s linear}
+.time{text-align:center;color:var(--muted);font-size:14px;margin-bottom:10px}
+.q{text-align:center;font-size:clamp(34px,10vw,46px);font-weight:800;margin:14px 0 18px;letter-spacing:1px}
+.shake{animation:sh .35s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.lose{text-align:center;padding:10px 0}
+.lose h2{color:var(--bad);font-size:30px;margin:6px 0}
+.count{font-size:80px;font-weight:800;color:var(--accent);line-height:1.1}
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>🧮 Matematika O’yini</h1>
+
+  <section id="auth">
+    <p class="sub">Akkaunt yarating yoki kiring</p>
+    <div class="tabs">
+      <button id="tLogin" class="on" type="button">Kirish</button>
+      <button id="tReg" type="button">Ro’yxatdan o’tish</button>
+    </div>
+    <input id="uName" placeholder="Ismingiz (login)" autocomplete="username" maxlength="20">
+    <input id="uPass" type="password" placeholder="Parol (kamida 4 belgi)" autocomplete="current-password">
+    <button id="authBtn" type="button">Kirish</button>
+    <div id="authMsg" class="msg"></div>
+  </section>
+
+  <section id="game" class="hidden">
+    <div class="top"><span class="user" id="who"></span><button class="ghost" id="logout" type="button">Chiqish</button></div>
+    <div class="stats">
+      <div class="stat"><small>Ball</small><b id="score">0</b></div>
+      <div class="stat"><small>Rekord</small><b id="best">0</b></div>
+    </div>
+    <div id="play">
+      <div class="bar"><i id="barI"></i></div>
+      <div class="time"><span id="sec">30</span> soniya qoldi</div>
+      <div class="q" id="q"></div>
+      <input id="ans" inputmode="numeric" pattern="[0-9]*" placeholder="Javobni kiriting" autocomplete="off">
+      <button id="send" type="button">Javobni yuborish</button>
+      <div id="msg" class="msg"></div>
+    </div>
+    <div id="lose" class="lose hidden">
+      <h2>Yutqazdingiz! 😢</h2>
+      <p class="sub">Vaqt tugadi. Yangi misol:</p>
+      <div class="count" id="cd">5</div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var TIME=30, mode="login", user=null, score=0, left=TIME, timer=null, answer=0;
+
+  function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+  function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+  async function hash(s){
+    try{
+      var b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("mq:"+s));
+      return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("");
+    }catch(e){var h=5381;for(var i=0;i<s.length;i++)h=(h*33)^s.charCodeAt(i);return "f"+(h>>>0)}
+  }
+
+  function setMode(m){
+    mode=m;
+    $("tLogin").className=m==="login"?"on":"";
+    $("tReg").className=m==="reg"?"on":"";
+    $("authBtn").textContent=m==="login"?"Kirish":"Akkaunt yaratish";
+    $("uPass").autocomplete=m==="login"?"current-password":"new-password";
+    $("authMsg").textContent="";
+  }
+  $("tLogin").onclick=function(){setMode("login")};
+  $("tReg").onclick=function(){setMode("reg")};
+
+  function say(el,t,c){el.textContent=t;el.className="msg "+(c||"")}
+
+  $("authBtn").onclick=async function(){
+    var n=$("uName").value.trim(), p=$("uPass").value, key=n.toLowerCase();
+    if(n.length<2) return say($("authMsg"),"Login kamida 2 belgi bo’lsin","bad");
+    if(p.length<4) return say($("authMsg"),"Parol kamida 4 belgi bo’lsin","bad");
+    var users=load("mq_users",{}), h=await hash(p);
+    if(mode==="reg"){
+      if(users[key]) return say($("authMsg"),"Bu login band","bad");
+      users[key]={name:n,pass:h,best:0};
+      save("mq_users",users);
+    }else{
+      if(!users[key]||users[key].pass!==h) return say($("authMsg"),"Login yoki parol noto’g’ri","bad");
+    }
+    save("mq_session",key);
+    $("uPass").value="";
+    start(key);
+  };
+  $("uPass").onkeydown=function(e){if(e.key==="Enter")$("authBtn").click()};
+
+  function start(key){
+    var users=load("mq_users",{});
+    if(!users[key]) return;
+    user=key; score=0;
+    $("auth").classList.add("hidden");
+    $("game").classList.remove("hidden");
+    $("who").textContent="👤 "+users[key].name;
+    $("best").textContent=users[key].best;
+    $("score").textContent=0;
+    nextQ();
+  }
+
+  $("logout").onclick=function(){
+    clearInterval(timer);
+    save("mq_session",null);
+    user=null;
+    $("game").classList.add("hidden");
+    $("auth").classList.remove("hidden");
+    setMode("login");
+  };
+
+  function rnd(){
+    var digits=Math.random()<.5?2:3;
+    var min=digits===2?10:100, max=digits===2?99:999;
+    return Math.floor(Math.random()*(max-min+1))+min;
+  }
+
+  function nextQ(){
+    $("lose").classList.add("hidden");
+    $("play").classList.remove("hidden");
+    var a=rnd(), b=rnd();
+    answer=a*b;
+    $("q").textContent=a+" × "+b+" = ?";
+    $("ans").value=""; say($("msg"),"");
+    runTimer();
+    if(!/Mobi|Android|iPhone/i.test(navigator.userAgent)) $("ans").focus();
+  }
+
+  function runTimer(){
+    clearInterval(timer);
+    left=TIME; draw();
+    timer=setInterval(function(){
+      left--; draw();
+      if(left<=0){clearInterval(timer);lose()}
+    },1000);
+  }
+  function draw(){
+    $("sec").textContent=left;
+    var bar=$("barI");
+    bar.style.width=(left/TIME*100)+"%";
+    bar.style.backgroundPosition=((1-left/TIME)*100)+"% 0";
+  }
+
+  function lose(){
+    score=0; $("score").textContent=0;
+    $("play").classList.add("hidden");
+    $("lose").classList.remove("hidden");
+    var c=5; $("cd").textContent=c;
+    var t=setInterval(function(){
+      c--;
+      if(c<=0){clearInterval(t);nextQ()} else $("cd").textContent=c;
+    },1000);
+  }
+
+  function check(){
+    var v=$("ans").value.trim();
+    if(v==="") return;
+    if(Number(v)===answer){
+      score+=10; $("score").textContent=score;
+      var users=load("mq_users",{});
+      if(users[user]&&score>users[user].best){
+        users[user].best=score; save("mq_users",users);
+        $("best").textContent=score;
+      }
+      nextQ();
+      say($("msg"),"To’g’ri! +10 ball 🎉","ok");
+    }else{
+      say($("msg"),"Noto’g’ri, qayta urinib ko’ring","bad");
+      var q=$("q"); q.classList.remove("shake"); void q.offsetWidth; q.classList.add("shake");
+      $("ans").value="";
+    }
+  }
+  $("send").onclick=check;
+  $("ans").onkeydown=function(e){if(e.key==="Enter")check()};
+
+  var s=load("mq_session",null);
+  if(s) start(s);
+})();
+</script>
+</body>
+</html>
